@@ -9,29 +9,28 @@ const remarks = [
     { value: "active_contribution", text: "Active Contribution Period" }
 ];
 
-function addRow(data = {}) {
+function addRow() {
     rowCount++;
     const tbody = document.getElementById('tableBody');
     const row = document.createElement('tr');
     
     row.innerHTML = `
         <td>${rowCount}</td>
-        <td><input type="text" class="est-name" value="${data.est || 'TechVision Solutions Pvt Ltd'}" oninput="calculateRow(this)"></td>
-        <td><input type="text" class="pf-no" value="${data.pf || 'KN/45678/9876543'}" oninput="calculateRow(this)"></td>
-        <td><input type="number" class="emp-share" value="${data.emp || 14500}" step="0.01" oninput="calculateRow(this)"></td>
-        <td><input type="number" class="empr-share" value="${data.empr || 4350}" step="0.01" oninput="calculateRow(this)"></td>
-        <td><input type="number" class="pension" value="${data.pens || 2175}" step="0.01" oninput="calculateRow(this)"></td>
+        <td><input type="text" class="est-name" placeholder="Establishment Name" oninput="calculateRow(this)"></td>
+        <td><input type="text" class="pf-no" placeholder="PF Account No." oninput="calculateRow(this)"></td>
+        <td><input type="number" class="emp-share" placeholder="0.00" step="0.01" oninput="calculateRow(this)"></td>
+        <td><input type="number" class="empr-share" placeholder="0.00" step="0.01" oninput="calculateRow(this)"></td>
+        <td><input type="number" class="pension" placeholder="0.00" step="0.01" oninput="calculateRow(this)"></td>
         <td><input type="text" class="row-total" value="0.00" readonly></td>
         <td>
             <select class="remark-select" onchange="calculateRow(this)">
-                ${remarks.map(r => `<option value="${r.value}" ${data.rem === r.value ? 'selected' : ''}>${r.text}</option>`).join('')}
+                ${remarks.map(r => `<option value="${r.value}">${r.text}</option>`).join('')}
             </select>
         </td>
-        <td><button onclick="this.closest('tr').remove(); updateSerialNumbers(); calculateTotals();" class="btn remove-row">Remove</button></td>
+        <td><button onclick="this.closest('tr').remove(); updateSerialNumbers(); calculateTotals();" class="btn remove-row" style="background:#ef4444; color:white; padding:8px 14px; font-size:0.9rem;">Remove</button></td>
     `;
     
     tbody.appendChild(row);
-    calculateRow(row.querySelector('input'));
 }
 
 function calculateRow(el) {
@@ -40,33 +39,32 @@ function calculateRow(el) {
     const empr = parseFloat(row.querySelector('.empr-share').value) || 0;
     const pension = parseFloat(row.querySelector('.pension').value) || 0;
     
-    const total = (emp + empr + pension).toFixed(2);
-    row.querySelector('.row-total').value = total;
-    
+    row.querySelector('.row-total').value = (emp + empr + pension).toFixed(2);
     calculateTotals();
 }
 
 function calculateTotals() {
-    let totalEmp = 0, totalEmpr = 0, totalPension = 0;
+    let empTotal = 0, emprTotal = 0, pensTotal = 0;
     
     document.querySelectorAll('#tableBody tr').forEach(row => {
-        totalEmp += parseFloat(row.querySelector('.emp-share').value) || 0;
-        totalEmpr += parseFloat(row.querySelector('.empr-share').value) || 0;
-        totalPension += parseFloat(row.querySelector('.pension').value) || 0;
+        empTotal += parseFloat(row.querySelector('.emp-share').value) || 0;
+        emprTotal += parseFloat(row.querySelector('.empr-share').value) || 0;
+        pensTotal += parseFloat(row.querySelector('.pension').value) || 0;
     });
     
-    const grand = totalEmp + totalEmpr + totalPension;
+    const grand = empTotal + emprTotal + pensTotal;
     
-    document.getElementById('totalEmp').textContent = `₹${totalEmp.toFixed(2)}`;
-    document.getElementById('totalEmpr').textContent = `₹${totalEmpr.toFixed(2)}`;
-    document.getElementById('totalPension').textContent = `₹${totalPension.toFixed(2)}`;
+    document.getElementById('totalEmp').textContent = `₹${empTotal.toFixed(2)}`;
+    document.getElementById('totalEmpr').textContent = `₹${emprTotal.toFixed(2)}`;
+    document.getElementById('totalPension').textContent = `₹${pensTotal.toFixed(2)}`;
     document.getElementById('grandTotal').textContent = `₹${grand.toFixed(2)}`;
 }
 
 function updateSerialNumbers() {
-    document.querySelectorAll('#tableBody tr').forEach((row, index) => {
-        row.cells[0].textContent = index + 1;
+    document.querySelectorAll('#tableBody tr').forEach((row, i) => {
+        row.cells[0].textContent = i + 1;
     });
+    rowCount = document.querySelectorAll('#tableBody tr').length;
 }
 
 // Download Functions
@@ -77,10 +75,10 @@ async function downloadPDF() {
     const canvas = await html2canvas(document.querySelector('.container'), { scale: 2 });
     const imgData = canvas.toDataURL('image/png');
     
-    const pdfWidth = doc.internal.pageSize.getWidth();
-    const pdfHeight = doc.internal.pageSize.getHeight();
+    const w = doc.internal.pageSize.getWidth();
+    const h = doc.internal.pageSize.getHeight();
     
-    doc.addImage(imgData, 'PNG', 8, 8, pdfWidth - 16, pdfHeight - 16);
+    doc.addImage(imgData, 'PNG', 10, 10, w-20, h-20);
     doc.save(`EPF_Passbook_${document.getElementById('empName').value || 'Employee'}.pdf`);
 }
 
@@ -94,7 +92,6 @@ async function downloadJPG() {
 
 // Initialize
 window.onload = () => {
-    addRow();
-    addRow();
+    // Start with one empty row
     addRow();
 };
