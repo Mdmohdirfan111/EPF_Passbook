@@ -9,34 +9,35 @@
 <body>
     <div class="container">
         <header>
-            <div class="logo">ProvidentLedger</div>
+            <div class="logo">
+                <span class="logo-icon">🔰</span>
+                ProvidentLedger
+            </div>
             <div class="header-info">
-                <h1>EPF Passbook</h1>
-                <p>Employee Provident Fund Balance Management System</p>
+                <h1>EPF PASSBOOK</h1>
+                <p>Live • Secure • Professional</p>
             </div>
-            <div class="built-by">
-                Built by Mohd Irfan
-            </div>
+            <div class="built-by">Built by Mohd Irfan</div>
         </header>
         
         <div class="main-content">
             <div class="input-section">
                 <div class="input-group">
-                    <label for="empName">Employee Name</label>
-                    <input type="text" id="empName" placeholder="Full Name" value="Rahul Sharma">
+                    <label>Employee Name</label>
+                    <input type="text" id="empName" placeholder="Enter Full Name">
                 </div>
                 <div class="input-group">
-                    <label for="uan">UAN Number</label>
-                    <input type="text" id="uan" placeholder="Universal Account Number" maxlength="12" value="123456789012">
+                    <label>UAN Number</label>
+                    <input type="text" id="uan" placeholder="12-digit UAN" maxlength="12">
                 </div>
             </div>
             
-            <h2>Contribution Details</h2>
+            <h2>Contribution Ledger</h2>
             
             <div class="actions">
-                <button onclick="addRow()" class="btn add-row">➕ Add Row</button>
-                <button onclick="downloadPDF()" class="btn btn-download">📄 Download PDF (Landscape)</button>
-                <button onclick="downloadJPG()" class="btn btn-download">🖼️ Download JPG</button>
+                <button onclick="addRow()" class="btn add-row">➕ Add New Row</button>
+                <button onclick="downloadPDF()" class="btn btn-pdf">📄 Export PDF (Landscape)</button>
+                <button onclick="downloadJPG()" class="btn btn-jpg">🖼️ Save as JPG</button>
             </div>
             
             <table id="epfTable">
@@ -57,27 +58,27 @@
             </table>
             
             <div class="totals">
-                <div class="total-item">
-                    <h3>Total Employee Share</h3>
+                <div class="total-card">
+                    <h3>Employee Share</h3>
                     <p id="totalEmp">₹0.00</p>
                 </div>
-                <div class="total-item">
-                    <h3>Total Employer Share</h3>
+                <div class="total-card">
+                    <h3>Employer Share</h3>
                     <p id="totalEmpr">₹0.00</p>
                 </div>
-                <div class="total-item">
-                    <h3>Total Pension Contribution</h3>
+                <div class="total-card">
+                    <h3>Pension Contribution</h3>
                     <p id="totalPension">₹0.00</p>
                 </div>
-                <div class="total-item grand">
-                    <h3>Grand Total</h3>
+                <div class="total-card grand-total">
+                    <h3>GRAND TOTAL</h3>
                     <p id="grandTotal">₹0.00</p>
                 </div>
             </div>
         </div>
         
         <footer>
-            ProvidentLedger — Professional EPF Passbook Management Tool © 2026
+            ProvidentLedger — Modern EPF Passbook Management System
         </footer>
     </div>
 
