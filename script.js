@@ -16,8 +16,8 @@ function addRow() {
     
     row.innerHTML = `
         <td>${rowCount}</td>
-        <td><input type="text" class="est-name" placeholder="Establishment Name" oninput="calculateRow(this)"></td>
-        <td><input type="text" class="pf-no" placeholder="PF Account No." oninput="calculateRow(this)"></td>
+        <td><input type="text" class="est-name" placeholder="Company Name" oninput="calculateRow(this)"></td>
+        <td><input type="text" class="pf-no" placeholder="PF No." oninput="calculateRow(this)"></td>
         <td><input type="number" class="emp-share" placeholder="0.00" step="0.01" oninput="calculateRow(this)"></td>
         <td><input type="number" class="empr-share" placeholder="0.00" step="0.01" oninput="calculateRow(this)"></td>
         <td><input type="number" class="pension" placeholder="0.00" step="0.01" oninput="calculateRow(this)"></td>
@@ -27,9 +27,8 @@ function addRow() {
                 ${remarks.map(r => `<option value="${r.value}">${r.text}</option>`).join('')}
             </select>
         </td>
-        <td><button onclick="this.closest('tr').remove(); updateSerialNumbers(); calculateTotals();" class="btn remove-row" style="background:#ef4444; color:white; padding:8px 14px; font-size:0.9rem;">Remove</button></td>
+        <td><button onclick="this.closest('tr').remove(); updateSerialNumbers(); calculateTotals()" class="remove-row">Remove</button></td>
     `;
-    
     tbody.appendChild(row);
 }
 
@@ -38,60 +37,59 @@ function calculateRow(el) {
     const emp = parseFloat(row.querySelector('.emp-share').value) || 0;
     const empr = parseFloat(row.querySelector('.empr-share').value) || 0;
     const pension = parseFloat(row.querySelector('.pension').value) || 0;
-    
     row.querySelector('.row-total').value = (emp + empr + pension).toFixed(2);
     calculateTotals();
 }
 
 function calculateTotals() {
-    let empTotal = 0, emprTotal = 0, pensTotal = 0;
-    
-    document.querySelectorAll('#tableBody tr').forEach(row => {
-        empTotal += parseFloat(row.querySelector('.emp-share').value) || 0;
-        emprTotal += parseFloat(row.querySelector('.empr-share').value) || 0;
-        pensTotal += parseFloat(row.querySelector('.pension').value) || 0;
+    let empT = 0, emprT = 0, pensT = 0;
+    document.querySelectorAll('#tableBody tr').forEach(r => {
+        empT += parseFloat(r.querySelector('.emp-share').value) || 0;
+        emprT += parseFloat(r.querySelector('.empr-share').value) || 0;
+        pensT += parseFloat(r.querySelector('.pension').value) || 0;
     });
     
-    const grand = empTotal + emprTotal + pensTotal;
-    
-    document.getElementById('totalEmp').textContent = `₹${empTotal.toFixed(2)}`;
-    document.getElementById('totalEmpr').textContent = `₹${emprTotal.toFixed(2)}`;
-    document.getElementById('totalPension').textContent = `₹${pensTotal.toFixed(2)}`;
+    const grand = empT + emprT + pensT;
+    document.getElementById('totalEmp').textContent = `₹${empT.toFixed(2)}`;
+    document.getElementById('totalEmpr').textContent = `₹${emprT.toFixed(2)}`;
+    document.getElementById('totalPension').textContent = `₹${pensT.toFixed(2)}`;
     document.getElementById('grandTotal').textContent = `₹${grand.toFixed(2)}`;
 }
 
 function updateSerialNumbers() {
-    document.querySelectorAll('#tableBody tr').forEach((row, i) => {
-        row.cells[0].textContent = i + 1;
-    });
-    rowCount = document.querySelectorAll('#tableBody tr').length;
+    document.querySelectorAll('#tableBody tr').forEach((row, i) => row.cells[0].textContent = i + 1);
 }
 
 // Download Functions
 async function downloadPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const container = document.getElementById('capture');
+    container.classList.add('pdf-mode');
     
-    const canvas = await html2canvas(document.querySelector('.container'), { scale: 2 });
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a3' }); // Changed to A3 for better fit
+    
+    const canvas = await html2canvas(container, { scale: 2 });
     const imgData = canvas.toDataURL('image/png');
     
     const w = doc.internal.pageSize.getWidth();
     const h = doc.internal.pageSize.getHeight();
     
-    doc.addImage(imgData, 'PNG', 10, 10, w-20, h-20);
-    doc.save(`EPF_Passbook_${document.getElementById('empName').value || 'Employee'}.pdf`);
+    doc.addImage(imgData, 'PNG', 10, 10, w - 20, h - 20);
+    doc.save(`EPF_Ledger_${document.getElementById('empName').value || 'Employee'}.pdf`);
+    
+    container.classList.remove('pdf-mode');
 }
 
 async function downloadJPG() {
-    const canvas = await html2canvas(document.querySelector('.container'), { scale: 2 });
+    const container = document.getElementById('capture');
+    container.classList.add('pdf-mode');
+    const canvas = await html2canvas(container, { scale: 2 });
     const link = document.createElement('a');
-    link.download = `EPF_Passbook_${document.getElementById('empName').value || 'Employee'}.jpg`;
+    link.download = `EPF_Ledger_${document.getElementById('empName').value || 'Employee'}.jpg`;
     link.href = canvas.toDataURL('image/jpeg', 0.95);
     link.click();
+    container.classList.remove('pdf-mode');
 }
 
-// Initialize
-window.onload = () => {
-    // Start with one empty row
-    addRow();
-};
+// Init
+window.onload = () => addRow();
